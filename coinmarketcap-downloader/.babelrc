@@ -1,0 +1,16 @@
+{
+  "plugins": [
+    "transform-runtime",
+    "transform-function-bind"
+  ],
+  "presets": [
+    ["env", {
+      "targets": {
+        "node": "current"
+      }
+    }],
+    "stage-0",
+    "react"
+  ],
+  "sourceMaps": "true"
+}
