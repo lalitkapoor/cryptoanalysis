@@ -1,0 +1,8 @@
+{
+  "name": "cryptoanalysis",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:lalitkapoor/cryptoanalysis.git",
+  "author": "Lalit Kapoor <lalitkapoor@gmail.com>",
+  "license": "Unlicensed"
+}
