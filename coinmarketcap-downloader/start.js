@@ -1,4 +1,5 @@
-import worker from './worker'
+import db from '@/lib/db'
+import Worker from './worker'
 
 process.on('uncaughtException', function (error) {
   console.log('uncaughtException')
@@ -10,4 +11,6 @@ process.on('unhandledRejection', function (reason, p) {
   console.log(reason)
 })
 
+const worker = new Worker()
 worker.run()
+.then(() => db.pg.end())

@@ -1,5 +1,6 @@
 CREATE TABLE cmc_market_data (
-  id TEXT PRIMARY KEY,
+  id BIGSERIAL PRIMARY KEY,
+  ticker TEXT NOT NULL,
   name TEXT NOT NULL,
   symbol TEXT NOT NULL,
   rank INTEGER NOT NULL,
@@ -16,4 +17,4 @@ CREATE TABLE cmc_market_data (
   last_updated TIMESTAMPTZ NOT NULL
 );
 
-CREATE UNIQUE INDEX cmc_market_data_unique_id_last_updated_idx ON cmc_market_data(id, last_updated);
+CREATE UNIQUE INDEX cmc_market_data_unique_ticker_last_updated_idx ON cmc_market_data(ticker, last_updated);

@@ -4,7 +4,7 @@ import appRoot from 'app-root-path'
 
 dotenv.load({
   silent: true,
-  path: path.resolve(__dirname + '/../.env')
+  path: path.resolve(__dirname + '/.env')
 })
 
 let config = {
@@ -22,4 +22,3 @@ config.PG_CONN_STR = process.env.PG_CONN_STR || process.env.DATABASE_URL
 if (config.ENV === 'test') config.PG_CONN_STR += '_test'
 
 export default config
-
