@@ -8,6 +8,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
+    "cron": "node -r ./bootstrap.js cron.js",
     "dev": "nodemon --verbose  --ignore db/migrations/ --watch . index.js",
     "test": "BLUEBIRD_DEBUG=1 NODE_ENV=test mocha",
     "create-db-migration": "./scripts/create-db-migration.sh",
@@ -56,6 +57,7 @@
     "babel-runtime": "6.20.0",
     "bcrypt": "1.0.3",
     "bluebird": "3.4.7",
+    "cron": "1.3.0",
     "database-cleaner": "1.2.0",
     "db-migrate": "0.10.0-beta.20",
     "db-migrate-pg": "0.1.11",
@@ -69,6 +71,7 @@
     "pg-util": "1.3.1",
     "source-map-support": "0.4.7",
     "sql": "0.78.0",
-    "sql-template-strings": "2.2.2"
+    "sql-template-strings": "2.2.2",
+    "uuid": "3.1.0"
   }
 }
