@@ -1,0 +1,9 @@
+CREATE INDEX cmc_market_data_ticker ON cmc_market_data(ticker);
+CREATE INDEX cmc_market_data_rank ON cmc_market_data(rank);
+CREATE INDEX cmc_market_data_last_updated ON cmc_market_data(last_updated);
+CREATE INDEX cmc_market_data_price_usd ON cmc_market_data(price_usd);
+CREATE INDEX cmc_market_data_market_cap_usd ON cmc_market_data(market_cap_usd);
+CREATE INDEX cmc_market_data_volume_24h_usd ON cmc_market_data(volume_24h_usd);
+CREATE INDEX cmc_market_data_percent_change_1h ON cmc_market_data(percent_change_1h);
+CREATE INDEX cmc_market_data_percent_change_24h ON cmc_market_data(percent_change_24h);
+CREATE INDEX cmc_market_data_percent_change_7d ON cmc_market_data(percent_change_7d);
