@@ -22,5 +22,4 @@ config.PG_CONN_STR = process.env.PG_CONN_STR || process.env.DATABASE_URL
 if (config.ENV === 'test') config.PG_CONN_STR += '_test'
 if (config.ENV === 'production') config.PG_CONN_STR += '?ssl=true'
 
-console.log(config)
 export default config
