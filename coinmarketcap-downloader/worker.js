@@ -55,7 +55,7 @@ const saveDataToDB = async (data) => {
   ).reduce((prev, curr) => prev.append(', ').append(curr))
 
   query.append(values)
-  query.append(' ON CONFLICT DO NOTHING')
+  query.append(' ON CONFLICT (ticker, last_updated) DO NOTHING')
 
   return await db.one(query)
 }
