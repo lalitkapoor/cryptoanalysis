@@ -1,2 +1,2 @@
-# crytoanalysis
+# cryptoanalysis
 cryptoanalysis
