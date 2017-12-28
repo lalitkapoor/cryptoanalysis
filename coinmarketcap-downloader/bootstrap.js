@@ -15,3 +15,12 @@ Promise.config({
 
 require('app-module-path').addPath(__dirname + '/.require-hack')
 
+process.on('uncaughtException', function (error) {
+  console.log('uncaughtException')
+  console.log(error)
+})
+
+process.on('unhandledRejection', function (reason, p) {
+  console.log('unhandledRejection')
+  console.log(reason)
+})
