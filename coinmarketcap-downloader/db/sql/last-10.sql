@@ -4,9 +4,11 @@ filtered AS (
     SELECT ticker
     FROM cmc_market_data
     WHERE
-      price_usd IS NULL AND
-      market_cap_usd IS NULL AND
-      market_cap_usd < 1000000
+      last_updated > now() - interval '3 hours' AND
+      (
+      market_cap_usd < 1000000 OR
+      price_usd IS NULL OR
+      market_cap_usd IS NULL)
   )
   ORDER BY last_updated DESC
 ),
