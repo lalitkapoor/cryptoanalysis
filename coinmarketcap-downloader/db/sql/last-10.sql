@@ -1,7 +1,7 @@
 WITH
 filtered AS (
-  SELECT * FROM cmc_market_data WHERE symbol NOT IN (
-    SELECT symbol
+  SELECT * FROM cmc_market_data WHERE ticker NOT IN (
+    SELECT ticker
     FROM cmc_market_data
     WHERE
       last_updated > now() - interval '3 hours' AND
@@ -18,8 +18,8 @@ last_3 AS (
   FROM (
     SELECT
       4 - ROW_NUMBER() OVER (
-        PARTITION BY symbol
-        ORDER BY symbol ASC, last_updated DESC
+        PARTITION BY ticker
+        ORDER BY ticker ASC, last_updated DESC
       ) AS row_num,
       filtered.*
     FROM filtered
@@ -27,7 +27,7 @@ last_3 AS (
   WHERE
     numbered.row_num <= 3 AND
     numbered.row_num > 0
-  ORDER BY symbol, row_num DESC
+  ORDER BY ticker, row_num DESC
 ),
 
 last_5 AS (
@@ -35,8 +35,8 @@ last_5 AS (
   FROM (
     SELECT
       6 - ROW_NUMBER() OVER (
-        PARTITION BY symbol
-        ORDER BY symbol ASC, last_updated DESC
+        PARTITION BY ticker
+        ORDER BY ticker ASC, last_updated DESC
       ) AS row_num,
       filtered.*
     FROM filtered
@@ -44,7 +44,7 @@ last_5 AS (
   WHERE
     numbered.row_num <= 5 AND
     numbered.row_num > 0
-  ORDER BY symbol, row_num DESC
+  ORDER BY ticker, row_num DESC
 ),
 
 last_10 AS (
@@ -52,8 +52,8 @@ last_10 AS (
   FROM (
     SELECT
       11 - ROW_NUMBER() OVER (
-        PARTITION BY symbol
-        ORDER BY symbol ASC, last_updated DESC
+        PARTITION BY ticker
+        ORDER BY ticker ASC, last_updated DESC
       ) AS row_num,
       filtered.*
     FROM filtered
@@ -61,98 +61,101 @@ last_10 AS (
   WHERE
     numbered.row_num <= 10 AND
     numbered.row_num > 0
-  ORDER BY symbol, row_num DESC
+  ORDER BY ticker, row_num DESC
 ),
 
 percent_change_3 AS (
   SELECT
     row_num,
-    symbol,
+    ticker,
     last_updated,
     price_usd,
     market_cap_usd,
-    (price_usd - lead(price_usd) OVER (PARTITION BY symbol ORDER BY row_num DESC)) / lead(price_usd) OVER (PARTITION BY symbol ORDER BY row_num DESC) * 100 as percent_change
+    (price_usd - lead(price_usd) OVER (PARTITION BY ticker ORDER BY row_num DESC)) / lead(price_usd) OVER (PARTITION BY ticker ORDER BY row_num DESC) * 100 as percent_change
   FROM last_3
 ),
 
 percent_change_5 AS (
   SELECT
     row_num,
-    symbol,
+    ticker,
     last_updated,
     price_usd,
     market_cap_usd,
-    (price_usd - lead(price_usd) OVER (PARTITION BY symbol ORDER BY row_num DESC)) / lead(price_usd) OVER (PARTITION BY symbol ORDER BY row_num DESC) * 100 as percent_change
+    (price_usd - lead(price_usd) OVER (PARTITION BY ticker ORDER BY row_num DESC)) / lead(price_usd) OVER (PARTITION BY ticker ORDER BY row_num DESC) * 100 as percent_change
   FROM last_5
 ),
 
 percent_change_10 AS (
   SELECT
     row_num,
-    symbol,
+    ticker,
     last_updated,
     price_usd,
     market_cap_usd,
-    (price_usd - lead(price_usd) OVER (PARTITION BY symbol ORDER BY row_num DESC)) / lead(price_usd) OVER (PARTITION BY symbol ORDER BY row_num DESC) * 100 as percent_change
+    (price_usd - lead(price_usd) OVER (PARTITION BY ticker ORDER BY row_num DESC)) / lead(price_usd) OVER (PARTITION BY ticker ORDER BY row_num DESC) * 100 as percent_change
   FROM last_10
 ),
 
 percent_change_3_counts AS (
-  SELECT symbol, COUNT(*) AS cnt
+  SELECT ticker, COUNT(*) AS cnt
   FROM percent_change_3
   WHERE
     percent_change_3.percent_change > 0 AND
     percent_change_3.percent_change <= 50
-  GROUP BY symbol
+  GROUP BY ticker
   ORDER BY cnt DESC
 ),
 
 percent_change_5_counts AS (
-  SELECT symbol, COUNT(*) AS cnt
+  SELECT ticker, COUNT(*) AS cnt
   FROM percent_change_5
   WHERE
     percent_change_5.percent_change >= 5 AND
     percent_change_5.percent_change <= 50
-  GROUP BY symbol
+  GROUP BY ticker
   ORDER BY cnt DESC
 ),
 
 percent_change_10_counts AS (
-  SELECT symbol, COUNT(*) AS cnt
+  SELECT ticker, COUNT(*) AS cnt
   FROM percent_change_10
   WHERE
     percent_change_10.percent_change >= 10 AND
     percent_change_10.percent_change <= 50
-  GROUP BY symbol
+  GROUP BY ticker
   ORDER BY cnt DESC
 ),
 
 final_analysis AS (
   SELECT
-    percent_change_10_counts.symbol,
+    percent_change_10_counts.ticker,
     percent_change_10_counts.cnt AS cnt_10,
     percent_change_5_counts.cnt AS cnt_5,
     percent_change_3_counts.cnt AS cnt_3
   FROM percent_change_10_counts
-  LEFT JOIN percent_change_3_counts USING (symbol)
-  LEFT JOIN percent_change_5_counts USING (symbol)
+  LEFT JOIN percent_change_3_counts USING (ticker)
+  LEFT JOIN percent_change_5_counts USING (ticker)
 )
 
 SELECT
   f.ticker,
-  f.symbol,
   f.rank,
   f.price_usd,
   f.market_cap_usd,
   f.volume_24h_usd,
-  f.last_updated  AT TIME ZONE 'America/New_York' AS last_updated
+  f.last_updated  AT TIME ZONE 'America/New_York' AS last_updated,
+  final_analysis.cnt_10,
+  final_analysis.cnt_5,
+  final_analysis.cnt_3
 FROM final_analysis
 INNER JOIN (
-  SELECT DISTINCT ON (symbol) *
+  SELECT DISTINCT ON (ticker) *
   FROM filtered
-  ORDER BY symbol, last_updated DESC
-) f USING(symbol)
+  ORDER BY ticker, last_updated DESC
+) f USING(ticker)
 WHERE
+  f.last_updated > now() - interval '10 minutes' AND -- if no update in the last 10 min, ignore
   cnt_10 >= 3 AND
   cnt_5 >= 1 AND
   cnt_3 >= 1
