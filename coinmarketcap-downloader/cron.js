@@ -5,7 +5,7 @@ import Worker from './worker'
 
 const worker = new Worker()
 
-new cron.CronJob('0 */3 * * * *', () => {
+new cron.CronJob('0 */1 * * * *', () => {
   const id = uuid.v4()
   console.log(id, 'importing started: ', new Date())
   worker.run().then(() => console.log(id, 'importing complete:', new Date()))
