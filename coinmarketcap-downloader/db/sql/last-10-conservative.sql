@@ -140,6 +140,7 @@ final_analysis AS (
 
 SELECT
   f.ticker,
+  f.symbol,
   f.rank,
   f.price_usd,
   f.market_cap_usd,
