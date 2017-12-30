@@ -21,9 +21,9 @@ new cron.CronJob('0 */1 * * * *', async () => {
     new PriceMomentumLast10ModerateStrategy()
   ]
 
-  strategies.forEach((strategy) => {
+  strategies.forEach(async(strategy) => {
     console.log(new Date(), id, 'running strategy:', strategy.name)
-    strategy.run().catch(console.log)
+    await strategy.run().catch(console.log)
     console.log(new Date(), id, 'done running strategy:', strategy.name)
   })
 

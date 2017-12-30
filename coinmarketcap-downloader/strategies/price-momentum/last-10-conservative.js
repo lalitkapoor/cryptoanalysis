@@ -5,7 +5,7 @@ export default class Strategy {
   get name() { return 'price-momentum/last-10-conservative' }
   async run() {
     const results = await db.run('last-10-conservative')
-    console.log(results)
+    console.log(this.name, results)
     if (!results.length) return
     // save to orders
     const insertSQLs = results.map(recommendation => {
