@@ -3,8 +3,9 @@ import db from '@/lib/db'
 
 export default class Strategy {
   get name() { return 'price-momentum/last-10-moderate' }
+
   async run() {
-    const results = await db.run('last-10-moderate')
+    const results = await db.run('strategies/price-momentum/last-10-moderate')
     console.log(this.name, results)
     if (!results.length) return
     // save to orders
@@ -16,7 +17,7 @@ export default class Strategy {
         price_usd,
         shares
       ) SELECT
-        'price-momentum/last-10-moderate',
+        ${this.name},
         ${recommendation.ticker},
         ${recommendation.symbol},
         ${recommendation.price_usd},
@@ -25,7 +26,7 @@ export default class Strategy {
         SELECT *
         FROM orders
         WHERE
-          strategy = 'price-momentum/last-10-moderate' AND
+          strategy = ${this.name} AND
           ticker = ${recommendation.ticker} AND
           symbol = ${recommendation.symbol} AND
           sell_at IS NULL

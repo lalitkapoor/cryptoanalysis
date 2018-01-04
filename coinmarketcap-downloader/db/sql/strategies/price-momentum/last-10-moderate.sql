@@ -1,15 +1,19 @@
 WITH
 filtered AS (
-  SELECT * FROM cmc_market_data WHERE ticker NOT IN (
-    SELECT ticker
-    FROM cmc_market_data
-    WHERE
-      last_updated > now() - interval '3 hours' AND
-      (
-      market_cap_usd < 1000000 OR
-      price_usd IS NULL OR
-      market_cap_usd IS NULL)
-  )
+  SELECT *
+  FROM cmc_market_data
+  WHERE
+    last_updated > now() - interval '3 hours' AND
+    ticker NOT IN (
+      SELECT ticker
+      FROM cmc_market_data
+      WHERE
+        last_updated > now() - interval '3 hours' AND
+        (
+        market_cap_usd < 1000000 OR
+        price_usd IS NULL OR
+        market_cap_usd IS NULL)
+    )
   ORDER BY last_updated DESC
 ),
 

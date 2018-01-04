@@ -8,11 +8,14 @@
   "main": "index.js",
   "scripts": {
     "coinmarketcap-downloader": "cd coinmarketcap-downloader && yarn run start",
-		"coinmarketcap-downloader-cron": "cd coinmarketcap-downloader && yarn run cron"
+    "coinmarketcap-downloader-cron": "cd coinmarketcap-downloader && yarn run cron"
   },
   "author": "Lalit Kapoor <lalitkapoor@gmail.com>",
   "license": "UNLICENSED",
   "devDependencies": {
     "concurrently": "^3.4.0"
+  },
+  "dependencies": {
+    "wscat": "^2.1.1"
   }
 }

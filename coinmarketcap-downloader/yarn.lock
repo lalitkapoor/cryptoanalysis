@@ -849,7 +849,7 @@ babel-register@^6.26.0:
     mkdirp "^0.5.1"
     source-map-support "^0.4.15"
 
-babel-runtime@6.20.0, babel-runtime@^6.0.0, babel-runtime@^6.11.6, babel-runtime@^6.20.0, babel-runtime@^6.9.0:
+babel-runtime@6.20.0, babel-runtime@^6.9.0:
   version "6.20.0"
   resolved "https://registry.yarnpkg.com/babel-runtime/-/babel-runtime-6.20.0.tgz#87300bdcf4cd770f09bf0048c64204e17806d16f"
   dependencies:
@@ -862,7 +862,7 @@ babel-runtime@^5.8.24:
   dependencies:
     core-js "^1.0.0"
 
-babel-runtime@^6.18.0, babel-runtime@^6.22.0, babel-runtime@^6.26.0:
+babel-runtime@^6.0.0, babel-runtime@^6.11.6, babel-runtime@^6.18.0, babel-runtime@^6.20.0, babel-runtime@^6.22.0, babel-runtime@^6.26.0:
   version "6.26.0"
   resolved "https://registry.yarnpkg.com/babel-runtime/-/babel-runtime-6.26.0.tgz#965c7058668e82b55d7bfe04ff2337bc8b5647fe"
   dependencies:
@@ -940,10 +940,6 @@ block-stream@*:
 bluebird@3.4.7, bluebird@^3.1.1, bluebird@^3.3.1:
   version "3.4.7"
   resolved "https://registry.yarnpkg.com/bluebird/-/bluebird-3.4.7.tgz#f72d760be09b7f76d08ed8fae98b289a8d05fab3"
-
-bluebird@^2.10.0:
-  version "2.11.0"
-  resolved "https://registry.yarnpkg.com/bluebird/-/bluebird-2.11.0.tgz#534b9033c022c9579c56ba3b3e5a5caafbb650e1"
 
 boom@2.x.x:
   version "2.10.1"
@@ -2475,13 +2471,6 @@ node-fs@~0.1.5:
   version "0.1.7"
   resolved "https://registry.yarnpkg.com/node-fs/-/node-fs-0.1.7.tgz#32323cccb46c9fbf0fc11812d45021cc31d325bb"
 
-node-pg-util@1.2.1:
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/node-pg-util/-/node-pg-util-1.2.1.tgz#0818578ecaba3f596d82c6546e2fa62e30f35df6"
-  dependencies:
-    bluebird "^2.10.0"
-    querybox "^0.2.0"
-
 node-pre-gyp@0.6.36:
   version "0.6.36"
   resolved "https://registry.yarnpkg.com/node-pre-gyp/-/node-pre-gyp-0.6.36.tgz#db604112cb74e0d477554e9b505b17abddfab786"
@@ -2724,12 +2713,12 @@ pg-types@1.*:
     postgres-date "~1.0.0"
     postgres-interval "^1.1.0"
 
-pg-util@1.3.1:
-  version "1.3.1"
-  resolved "https://registry.yarnpkg.com/pg-util/-/pg-util-1.3.1.tgz#18062f8048c7dd03498a644549e34147cae39f28"
+pg-util@1.3.2:
+  version "1.3.2"
+  resolved "https://registry.yarnpkg.com/pg-util/-/pg-util-1.3.2.tgz#c9afcb1579d54408f29ee2395f9b45b727bd7042"
   dependencies:
     babel-runtime "^5.8.24"
-    querybox "^0.2.0"
+    querybox lalitkapoor/node-querybox#v1.0.0
 
 pg@6.1.1:
   version "6.1.1"
@@ -2869,9 +2858,9 @@ qs@^6.1.0, qs@~6.4.0:
   version "6.4.0"
   resolved "https://registry.yarnpkg.com/qs/-/qs-6.4.0.tgz#13e26d28ad6b0ffaa91312cd3bf708ed351e7233"
 
-querybox@^0.2.0:
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/querybox/-/querybox-0.2.0.tgz#6ffb4cc76a6d1199f6b6efbeeeaaaa512ce12679"
+"querybox@github:lalitkapoor/node-querybox#v1.0.0":
+  version "1.0.0"
+  resolved "https://codeload.github.com/lalitkapoor/node-querybox/tar.gz/3f738b35ad12e02c61a66673670a40df02f57ea3"
   dependencies:
     glob "~3.2.8"
 
