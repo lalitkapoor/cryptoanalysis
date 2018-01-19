@@ -1,6 +1,9 @@
 import db from '@/lib/db'
-import Worker from './worker'
+import CoinMarketCapWorker from './CoinMarketCapWorker'
+import BinanceWorker from './BinanceWorker'
 
-const worker = new Worker()
-worker.run()
-.then(() => db.pg.end())
+// const cmcWorker = new CoinMarketCapWorker()
+// cmcWorker.run().then(() => db.pg.end())
+
+const binanceWorker = new BinanceWorker()
+binanceWorker.run()
