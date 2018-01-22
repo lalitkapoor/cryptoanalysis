@@ -7,8 +7,8 @@
   },
   "main": "index.js",
   "scripts": {
-    "coinmarketcap-downloader": "cd coinmarketcap-downloader && yarn run start",
-    "coinmarketcap-downloader-cron": "cd coinmarketcap-downloader && yarn run cron"
+    "coinmarketcap-downloader": "cd analysis && yarn run start",
+    "coinmarketcap-downloader-cron": "cd analysis && yarn run cron"
   },
   "author": "Lalit Kapoor <lalitkapoor@gmail.com>",
   "license": "UNLICENSED",
