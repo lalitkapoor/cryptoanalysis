@@ -8,6 +8,9 @@ export default class Worker {
     this.stats = {}
     this.watch = {}
     this.buys = {}
+    this.sold = []
+    this.availableMoney = 1000
+    this.investPerTrade = 250
     this._rowsPrinted = 0
   }
   async run() {
@@ -22,21 +25,10 @@ export default class Worker {
   }
 
   handleMessage(msg) {
-    // console.log(msg)
-    // return
     const data = JSON.parse(msg)
     const filtered = data.filter((ticker) => {
       return ['BTC'].includes(ticker.s.substr(-3))
     })
-
-    // add stat for missing data to filtered (use the average for volume, last price for price)
-    // const missing = _.difference(Object.keys(this.stats), filtered.map(ticker => ticker.s))
-    // const fillerForMissingData = missing.map(ticker => ({
-    //   s: ticker,
-    //   v: this.stats[ticker].average,
-    //   c: this.stats[ticker].price
-    // }))
-    // Array.prototype.push.apply(filtered, fillerForMissingData)
 
     // calculate moving average in a window
     filtered.map((ticker) => {
@@ -55,7 +47,36 @@ export default class Worker {
       stat.measures.push(measure)
     })
 
-    // console.log(this.stats)
+
+    let report = false
+    // sell things and report on it
+    Object.keys(this.buys).forEach((ticker) => {
+      const buy = this.buys[ticker]
+      const stat = this.stats[ticker]
+      const lastMeasure = stat.measures[stat.measures.length - 1]
+      if (lastMeasure >= buy.profitAt) {
+        this.sold.push({ticker: ticker, buyAt: buy.price, soldAt: buy.profitAt, profit: (buy.profitAt/buy.price - 1) * 100})
+        this.availableMoney += this.investPerTrade * (buy.profitAt/buy.price)
+        console.log(ticker, 'met', buy.price, buy.profitAt, (buy.profitAt/buy.price - 1) * 100, this.availableMoney)
+        delete this.buys[ticker]
+        report = true
+      } else if (lastMeasure <= buy.lossAt) {
+        this.sold.push({ticker: ticker, buyAt: buy.price, soldAt: buy.lossAt, profit: (buy.lossAt/buy.price - 1) * 100})
+        this.availableMoney += this.investPerTrade * (buy.lossAt/buy.price)
+        console.log(ticker, 'loss', buy.price, buy.profitAt, (buy.profitAt/buy.price - 1) * 100, this.availableMoney)
+        delete this.buys[ticker]
+        report = true
+      } else if (moment() > buy.expiration) {
+        this.sold.push({ticker: ticker, buyAt: buy.price, soldAt: lastMeasure, profit: (lastMeasure/buy.price - 1) * 100})
+        this.availableMoney += this.investPerTrade * (lastMeasure/buy.price)
+        console.log(ticker, 'expired', buy.price, lastMeasure, (lastMeasure/buy.price - 1) * 100, this.availableMoney)
+        delete this.buys[ticker]
+        report = true
+      }
+    })
+
+    if (report === true) console.log('total profit:', this.sold.reduce((sum, item) => {return sum + item.profit}, 0)/this.sold.length)
+
 
     Object.keys(this.stats).forEach((ticker) => {
       const stat = this.stats[ticker]
@@ -63,27 +84,29 @@ export default class Worker {
 
       const lastMeasure = stat.measures[stat.measures.length - 1]
       const percentChange = (stat.measures[stat.measures.length - 1]/stat.average - 1) * 100
-      if (percentChange >= 2) {
-        const watch = this.watch[ticker] = this.watch[ticker] || {
+      let watch = this.watch[ticker]
+      let bought = this.buys[ticker]
+
+      if (percentChange >= 2 && percentChange <= 10) {
+        watch = this.watch[ticker] = this.watch[ticker] || {
           lastMeasure: lastMeasure,
           timeout: setTimeout(() => delete this.watch[ticker], 1000 * 60 * 5)
         }
+      }
 
-        // console.log('watching', ticker, 'for 60 seconds for increases')
-
-        if (lastMeasure/watch.lastMeasure > 1.02) {
-          this.buys =
-          watch.lastMeasure = lastMeasure
-          clearTimeout(this.watch[ticker].timeout)
-          setTimeout(() => delete this.watch[ticker], 1000 * 60 * 5)
-          this.printRow(
-            moment().format(),
-            ticker,
-            Math.round(percentChange * 100000000) / 100000000,
-            Math.round(lastMeasure * 100000000) / 100000000,
-            Math.round(stat.average * 100000000) / 100000000
-          )
-        }
+      if (watch && !bought && lastMeasure/watch.lastMeasure > 1.02 && lastMeasure/watch.lastMeasure < 1.08 && this.availableMoney > 100) {
+        watch.lastMeasure = lastMeasure
+        clearTimeout(this.watch[ticker].timeout)
+        delete this.watch[ticker]
+        this.availableMoney -= this.investPerTrade
+        this.buys[ticker] = {price: lastMeasure, timestamp: moment(), expiration: moment().add(30, 'm'), profitAt: lastMeasure * 1.10, lossAt: lastMeasure * 0.90}
+        this.printRow(
+          moment().format(),
+          ticker,
+          Math.round(percentChange * 100000000) / 100000000,
+          Math.round(lastMeasure * 100000000) / 100000000,
+          Math.round(stat.average * 100000000) / 100000000
+        )
       }
     })
   }
