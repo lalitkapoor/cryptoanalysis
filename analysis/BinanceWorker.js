@@ -55,27 +55,33 @@ export default class Worker {
       const stat = this.stats[ticker]
       const lastMeasure = stat.measures[stat.measures.length - 1]
       if (lastMeasure >= buy.profitAt) {
-        this.sold.push({ticker: ticker, buyAt: buy.price, soldAt: buy.profitAt, profit: (buy.profitAt/buy.price - 1) * 100})
+        this.sold.push({ticker: ticker, buyAt: buy.price, soldAt: buy.profitAt, profit: ((buy.profitAt/buy.price - 1) * this.investPerTrade)})
         this.availableMoney += this.investPerTrade * (buy.profitAt/buy.price)
-        console.log(ticker, 'met', buy.price, buy.profitAt, (buy.profitAt/buy.price - 1) * 100, this.availableMoney)
+        console.log(ticker, 'met', buy.price, buy.profitAt, ((buy.profitAt/buy.price - 1) * this.investPerTrade), this.availableMoney)
         delete this.buys[ticker]
         report = true
       } else if (lastMeasure <= buy.lossAt) {
-        this.sold.push({ticker: ticker, buyAt: buy.price, soldAt: buy.lossAt, profit: (buy.lossAt/buy.price - 1) * 100})
+        this.sold.push({ticker: ticker, buyAt: buy.price, soldAt: buy.lossAt, profit: ((buy.lossAt/buy.price - 1) * this.investPerTrade)})
         this.availableMoney += this.investPerTrade * (buy.lossAt/buy.price)
-        console.log(ticker, 'loss', buy.price, buy.profitAt, (buy.profitAt/buy.price - 1) * 100, this.availableMoney)
+        console.log(ticker, 'loss', buy.price, buy.profitAt, ((buy.lossAt/buy.price - 1) * this.investPerTrade), this.availableMoney)
         delete this.buys[ticker]
         report = true
       } else if (moment() > buy.expiration) {
-        this.sold.push({ticker: ticker, buyAt: buy.price, soldAt: lastMeasure, profit: (lastMeasure/buy.price - 1) * 100})
+        this.sold.push({ticker: ticker, buyAt: buy.price, soldAt: lastMeasure, profit: ((lastMeasure/buy.price - 1) * this.investPerTrade)})
         this.availableMoney += this.investPerTrade * (lastMeasure/buy.price)
-        console.log(ticker, 'expired', buy.price, lastMeasure, (lastMeasure/buy.price - 1) * 100, this.availableMoney)
+        console.log(ticker, 'expired', buy.price, lastMeasure, ((lastMeasure/buy.price - 1) * this.investPerTrade), this.availableMoney)
         delete this.buys[ticker]
         report = true
       }
     })
 
-    if (report === true) console.log('total profit:', this.sold.reduce((sum, item) => {return sum + item.profit}, 0)/this.sold.length)
+    if (report === true) console.log(
+      '\ntotal profit:', this.sold.reduce((sum, item) => {return sum + item.profit}, 0)/this.sold.length,
+      '\ntotal available money', this.availableMoney,
+      '\ntotal in buys', (this.investPerTrade * Object.keys(this.buys).length),
+      '\ntotal:', (this.investPerTrade * Object.keys(this.buys).length) + this.availableMoney,
+      '\n'
+    )
 
 
     Object.keys(this.stats).forEach((ticker) => {
@@ -87,19 +93,25 @@ export default class Worker {
       let watch = this.watch[ticker]
       let bought = this.buys[ticker]
 
-      if (percentChange >= 2 && percentChange <= 10) {
+      if (percentChange >= 1 && percentChange <= 10) {
         watch = this.watch[ticker] = this.watch[ticker] || {
           lastMeasure: lastMeasure,
-          timeout: setTimeout(() => delete this.watch[ticker], 1000 * 60 * 5)
+          timeout: setTimeout(() => delete this.watch[ticker], 1000 * 60 * 2)
         }
       }
 
-      if (watch && !bought && lastMeasure/watch.lastMeasure > 1.02 && lastMeasure/watch.lastMeasure < 1.08 && this.availableMoney > 100) {
+      if (watch && !bought && lastMeasure/watch.lastMeasure > 1.01 && lastMeasure/watch.lastMeasure < 1.08 && this.availableMoney > 100) {
         watch.lastMeasure = lastMeasure
         clearTimeout(this.watch[ticker].timeout)
         delete this.watch[ticker]
         this.availableMoney -= this.investPerTrade
-        this.buys[ticker] = {price: lastMeasure, timestamp: moment(), expiration: moment().add(30, 'm'), profitAt: lastMeasure * 1.10, lossAt: lastMeasure * 0.90}
+        this.buys[ticker] = {
+          price: lastMeasure,
+          timestamp: moment(),
+          expiration: moment().add(3, 'm'),
+          profitAt: lastMeasure * 1.03,
+          lossAt: lastMeasure * 0.97
+        }
         this.printRow(
           moment().format(),
           ticker,
