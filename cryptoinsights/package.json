@@ -1,0 +1,85 @@
+{
+  "name": "cryptoinsights",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "babel src/ -d lib/",
+    "lint": "prettier-eslint src/**/*.js && flow src",
+    "precommit": "npm run build && npm run lint",
+    "dev": "babel-node --plugins inline-dotenv index.js",
+    "start": "node -r dotenv/config index.js",
+    "test": "jest src",
+    "test-watch": "jest --watch src"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "db": "^1.0.6",
+    "dotenv": "^4.0.0",
+    "multitrim": "^2.0.0",
+    "object": "^0.1.1",
+    "object-loops": "^0.8.0",
+    "pg": "^7.4.1",
+    "r2": "^2.0.0",
+    "sql-template-strings": "^2.2.2"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
+    "babel-jest": "^22.1.0",
+    "babel-plugin-inline-dotenv": "^1.1.2",
+    "babel-plugin-module-resolver": "^3.0.0",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-flow": "^6.23.0",
+    "babel-preset-jest": "^22.1.0",
+    "flow-bin": "^0.63.1",
+    "husky": "^0.14.3",
+    "jest": "^22.1.4",
+    "pg-error": "^1.0.0",
+    "prettier": "^1.10.2",
+    "prettier-eslint-cli": "^4.7.0",
+    "wtfnode": "^0.5.7"
+  },
+  "babel": {
+    "plugins": [
+      "transform-class-properties",
+      [
+        "module-resolver",
+        {
+          "root": [
+            "src"
+          ]
+        }
+      ]
+    ],
+    "presets": [
+      "flow",
+      [
+        "env",
+        {
+          "targets": {
+            "node": "8.9"
+          }
+        }
+      ]
+    ],
+    "moduleRoot": "src"
+  },
+  "eslintConfig": {
+    "extends": [
+      "plugin:prettier/recommended"
+    ]
+  },
+  "jest": {
+    "setupFiles": [
+      "./node_modules/dotenv/config"
+    ]
+  },
+  "prettier": {
+    "semi": false,
+    "singleQuote": true,
+    "trailingComma": "all"
+  }
+}
