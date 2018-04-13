@@ -16,7 +16,6 @@ new cron.CronJob('0 */1 * * * *', async () => {
   console.log(new Date(), id, 'importing complete')
 
   // run strategies
-  return // DISABLE STRATEGY RUNNER FOR NOW, RUNNING OUT OF MEMORY
   const strategies = [
     new PriceMomentumLast10ConservativeStrategy(),
     new PriceMomentumLast10ModerateStrategy()
